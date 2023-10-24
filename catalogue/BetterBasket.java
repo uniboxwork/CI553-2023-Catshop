@@ -15,4 +15,13 @@ public class BetterBasket extends Basket implements Serializable
   
 
   // You need to add code here
+  
+  //overriding the add method...
+  public boolean add( Product pr ) {
+	  
+	  return super.add( pr );	// call add in ArrayList
+  }
+  
+  
+  
 }
