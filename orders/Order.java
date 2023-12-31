@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 import java.util.*;
 
+import voiceBox.VoiceBox;			//VoiceBox addon by J.Grace
+
+
 /**
  * The order processing system.<BR>
  * Manages the progression of customer orders, 
@@ -133,6 +136,16 @@ public class Order implements OrderProcessing
            folders.get(i).getState()                == State.BeingPicked )
       {
         folders.get(i).newState( State.ToBeCollected );
+        
+        
+        //**************TEST HOOK/INSERTION POINT *******************
+        System.out.println("VOICEBOX: SPEAK ORDER: " + orderNum);
+        
+        VoiceBox voiceBox = new VoiceBox();
+        
+        voiceBox.speakOrder(orderNum);
+        
+        
         return true;
       }
     }
