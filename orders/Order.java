@@ -138,7 +138,7 @@ public class Order implements OrderProcessing
         folders.get(i).newState( State.ToBeCollected );
         
         
-        //**************TEST HOOK/INSERTION POINT *******************
+        //**************VOICEBOX HOOK/INSERTION POINT *******************
         System.out.println("VOICEBOX: SPEAK ORDER: " + orderNum);
         
         VoiceBox voiceBox = new VoiceBox();

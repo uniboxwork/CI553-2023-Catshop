@@ -18,22 +18,20 @@ import java.util.ListIterator;
 
 
 
-//LineListener is the interface for receiving events from the audio mixer line (i.e. when a clip is finished playing)
-public class Sentence implements LineListener 
+
+public class Sentence implements LineListener 		//LineListener is the interface for receiving events from the audio mixer line (i.e. when a clip is finished playing)
 {
     // instance variables
 	
-	String baseFilePath = "voiceBox/";		//path to folder containing .wavs
+	private ArrayList<String> wordsList;    		//the list of words (.wav files) to be spoken in this sentence
+	
+	private String baseFilePath = "voiceBox/";		//base path to the folder containing .wavs
+	private String wavFilePath;             		//path to the .wav word file to be played/spoken
+    private ListIterator<String> listIterator;      //iterator object for moving through wordsList
     
-    ArrayList<String> wordsList;    //the list of words to be spoken in this sentence
+    AudioInputStream audioStream;   				//reads .wav data from disc
     
-    String wavFilePath = "";             //the path to the .wav word file to be played/spoken
-    
-    ListIterator<String> listIterator;      //iterator object for moving through wordsList
-    
-    AudioInputStream audioStream;   //reads .wav data from disc
-    
-    Clip clip;                      //an audio clip to act as an input to the audio mixer. (Holds a .wav recording. Read in from audioStream)
+    Clip clip;                      				//an audio clip to act as an input to the audio mixer. (Holds a .wav recording. Read in from audioStream)
     
     
 
@@ -41,30 +39,19 @@ public class Sentence implements LineListener
     /**
      * Constructor for Sentence
      * 
-     * @param words list of .wav file paths containing words/phrases to bespoken
+     * @param words list of .wav file paths containing words/phrases to be spoken
      */
     public Sentence(ArrayList<String> words)
     {
-        // set wordsList to point to words ArrayList<String> passed into constructor...
-        wordsList = words;
         
-        /*
-        addWord("1.wav");
-        addWord("2.wav");
-        addWord("3.wav");
-        addWord("4.wav");
-        addWord("5.wav");
-        addWord("6.wav");
-        addWord("7.wav");
-        addWord("8.wav");
-        addWord("9.wav");
-        addWord("10.wav");
-        */
+    	
+        wordsList = words;							// set wordsList to point to words ArrayList<String> passed into constructor...
         
-        listIterator = wordsList.listIterator(0); //initialise list iterator at beginning of wordsList
+        wavFilePath = "";             				//initialise path to word .wav file to be played/spoken
         
-        //start speaking wordsList...
-        sayNextWord(); 
+        listIterator = wordsList.listIterator(0); 	//initialise list iterator at beginning of wordsList
+        
+        sayNextWord(); 								//start speaking wordsList...
         
         
 
@@ -72,22 +59,7 @@ public class Sentence implements LineListener
 
     
     
-    /**
-     * Adds a word to the word list, (later to be spoken)
-     *
-     * @param word (String) file path to a .wav file containing a word to be spoken
-     * @return      void
-     */
-    public void addWord(String word)
-    {
-       
-        //add word to wordsList...
-        wordsList.add(word);
-        
-    }
-    
-    
-    
+   
     
     /***
      * 
@@ -96,30 +68,12 @@ public class Sentence implements LineListener
      */
     private void sayNextWord() {
         
-            //NOTE: IF NEXT WORD DOES NOT EXIST, THEN EVERY WORD IN THE SENTENCE HAS BEEN SAID. NEED TO PASS BACK A MESSAGE THAT THE NEXT 
-            //      ORDER NUMBER CAN NOW BE SENT TO BE SPOKEN. COULD BE A FLAG SET BACK IN OTHER CLASS,E.G. FINISHED=TRUE THAT HAS BUSY WAITING 
-            //      (WHILE LOOP) THAT ENDLESSLY WAITS FOR FLAG TO CHANGE, THEN CREATES NEXT SENTENCE OBJECT
-            //      
-            //      AT PRESENT, WE NOW HAVE THE ABILITY TO SPEAK A SINGLE ORDER NUMBER. THIS COULD INCLUDE THOUSANDS, HUNDREDS, TENS, UNITS
-            //      WHAT WE ARE NOW FACING IS CONTROLLING THE SPEAKING OF ONE ORDER AFTER ANOTHER, AFTER ANOTHER, ETC.
-            
-            //      GET THE THOUSANDS WORKING FIRST
-            //      GET THE HUNDREDS WORKING FIRST
-            //      THEN GO FOR INTER ORDER NUMBER CONTROL. I THINK BUSY WAITING ON A LIST TO BE DONE, COULD BE THE ANSWER.
-            //      MIGHT NEED OWN THREAD SO THAT BASKET(S) CAN KEEP SENDING ORDER READY MESSAGES TO SPEAK BUFFER?
-        
-            //next word exists?
-            if(listIterator.hasNext()) { //exists...
+           
+            if(listIterator.hasNext()) {  //next word exists...
                 
-                System.out.println("sayNextWord() - next word exists...");
+                  
+                wavFilePath = listIterator.next();  	//read next word file path...
                 
-                //read next word file path...
-                wavFilePath = listIterator.next();
-                
-                
-                
-                //System.out.println("wavFilePath: " + wavFilePath);
-                System.out.println("wavFilePath: " + baseFilePath + wavFilePath);
                 
                 //play next word
                 
@@ -127,8 +81,7 @@ public class Sentence implements LineListener
                 {
                     try
                     {
-                        //the input stream for the audiofile stored on disc
-                    //audioStream = AudioSystem.getAudioInputStream(new File(wavFilePath).getAbsoluteFile());
+                    //the input stream for the audiofile stored on disc
                     audioStream = AudioSystem.getAudioInputStream(new File(baseFilePath + wavFilePath).getAbsoluteFile());
                     }
                     catch (IOException ioe)
@@ -143,7 +96,7 @@ public class Sentence implements LineListener
                 
                 
         
-                //get a reference to the audio system clip object (does this create one? Or use one that exists?)
+                //get a reference to the audio system clip object
                 try
                 {
                     clip = AudioSystem.getClip();
@@ -173,30 +126,17 @@ public class Sentence implements LineListener
                 }
                         
                 
-                //set audio line event listener for catching Stop event, to this class. Triggered when .wav clip has finished playing...
-                clip.addLineListener(this);
+                
+                clip.addLineListener(this);     //set audio line event listener for catching Stop event, to this class. Triggered when .wav clip has finished playing...
 
-                //play clip/wav file
-                clip.start();
+                
+                clip.start();					//play clip/wav file
                 
                 
                 
                 
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                           
                 
                 
             }//end if 
@@ -213,14 +153,39 @@ public class Sentence implements LineListener
     
     
     
-    //Start speaking the words in wordsList...
-    public void speak() {
+    
+    
+    
+    
+    /***
+     * Registered to receive audio mixer line events
+     */
+    public void update(LineEvent lineEvent) {
+        //debug
+        System.out.println("*********************");
+        System.out.println(" LINE EVENT RECEIVED ");
+        System.out.println("*********************");
+        System.out.println(lineEvent);
+        System.out.println(lineEvent.getType());
         
+        //Previous word.wav finished playing?...
+        if(lineEvent.getType().toString() == "Stop") { //word finished...
+            
+            //say next word in the wordsList...
+            sayNextWord();
+            
+            
+        }
         
-        sayNextWord();
-        
-   
-    }
+    }//end update(LineEvent)
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     /**
@@ -228,7 +193,7 @@ public class Sentence implements LineListener
      * 
      */
     public void print() {
-        
+        //debug
         System.out.println("========================");
         System.out.println("    S E N T E N C E");
         System.out.println("========================");
@@ -255,34 +220,11 @@ public class Sentence implements LineListener
     
     
     
-    
-    /***
-     * Registered to receive audio mixer line events
-     */
-    
-    public void update(LineEvent lineEvent) {
-        
-        System.out.println("*********************");
-        System.out.println(" LINE EVENT RECEIVED ");
-        System.out.println("*********************");
-        System.out.println(lineEvent);
-        
-        System.out.println(lineEvent.getType());
-        
-        //Previous word.wav finished playing?...
-        if(lineEvent.getType().toString() == "Stop") { //word finished...
-            
-            //say next word in the wordsList...
-            sayNextWord();
-            
-            
-        }
-        
-    }//end update(LineEvent)
+   
     
     
     
     
     
-}//end class Sentence_02
+}//end class Sentence
 

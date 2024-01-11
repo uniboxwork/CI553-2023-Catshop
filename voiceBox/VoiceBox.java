@@ -21,7 +21,15 @@ public class VoiceBox
 {
 
     
-    ArrayList<String> words;   //container for words (.wav file paths) to be spoken
+    private ArrayList<String> words;   					 //container for words (.wav file paths) to be spoken
+    
+    private String alertSound = "bell.wav";              		//path to recorded alert sound
+    private String openingPhrase = "orderNumber.wav";           //path to recorded opening phrase of announcement (intro)
+    private String closingPhrase = "readyForCollection.wav";    //path to recorded closing phrase of announcement (outro)
+    
+    
+    
+    
     
     /**
      * Constructor for VoiceBox
@@ -29,8 +37,8 @@ public class VoiceBox
     public VoiceBox() 
     {
         
-        /*
         
+        /*
         //live testing using scanner...
         
         boolean finished = false;
@@ -57,23 +65,12 @@ public class VoiceBox
                 
             }
             
-        }    
+        }
+            
+        */
         
-        //TESTING speakNumber - values 0-99
-        /*
-        for(int i=0; i<5; i++) {
-            
-            speakNumber(i);
-            
-            
-        }//end for
         
-       */
-
-          //speakOrder(909199);
-          
-          
-      
+        
       
         
     }//end constructor()
@@ -87,20 +84,16 @@ public void speakOrder(int number) {
     //initialise blank words list...
     words = new ArrayList<String>();
     
-    String alertSound = "bell.wav";                           //path to recorded alert sound
-    String openingPhrase = "orderNumber.wav";           //path to recorded oppening phrase of announcement (intro)
-    String closingPhrase = "readyForCollection.wav";    //path to recorded closing phrase of announcement   (outro)
-    
     int remaining = number; //running total/remainder after each unit of magnitude removed. Initialised to number argument.
     
     int hundredThousands;   //the number of hundred thousands present in the number
     int thousands;          //the number of thousands present in the number
     int hundreds;           //the number of hundreds present in the number
-    int tens_and_units;     //the number of tens and units (0-99)
+    //int tens_and_units;     //the number of tens and units (0-99)
     
     
     words.add(alertSound);         //add alert sound sound to words
-    words.add(openingPhrase);      //add openning announcement phrase
+    words.add(openingPhrase);      //add opening announcement phrase
     
     
     hundredThousands = remaining / 100000;  //calculate number of 100,000s present
@@ -183,10 +176,6 @@ public void speakOrder(int number) {
     //speak sentence of words...
     Sentence sentence = new Sentence(words);
         
-    //sentence.print();
-    
-    
-    
     
 
 }//end speakOrder
@@ -197,11 +186,11 @@ public void speakOrder(int number) {
 //converts an integer between 0-99 into file paths to .wav spoken words. 
 //Adds .wav file paths to words list
 //can "speak" numbers 0-99
-public void numberToWords(int number) {
+private void numberToWords(int number) {
     
     System.out.println("");
     System.out.println("==============================");
-    System.out.println("numberToWavs(" + number + ")");
+    System.out.println("numberToWords(" + number + ")");
         
     int remaining = number;
     int tens;
